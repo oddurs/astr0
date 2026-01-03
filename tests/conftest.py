@@ -29,6 +29,64 @@ import math
 from datetime import datetime, timezone
 from typing import Callable, Any
 
+
+# =============================================================================
+# Custom Test Output
+# =============================================================================
+
+def pytest_report_teststatus(report, config):
+    """Customize test status characters for cleaner output."""
+    if report.when == 'call':
+        if report.passed:
+            return 'passed', '✓', 'PASSED'
+        elif report.failed:
+            return 'failed', '✗', 'FAILED'
+        elif report.skipped:
+            return 'skipped', '○', 'SKIPPED'
+    return None
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """Add custom astronomy-themed summary at the end of test run."""
+    passed = len(terminalreporter.stats.get('passed', []))
+    failed = len(terminalreporter.stats.get('failed', []))
+    skipped = len(terminalreporter.stats.get('skipped', []))
+    errors = len(terminalreporter.stats.get('error', []))
+    total = passed + failed + skipped + errors
+    
+    if total == 0:
+        return
+    
+    # Calculate pass rate
+    pass_rate = (passed / total * 100) if total > 0 else 0
+    
+    # Build summary
+    terminalreporter.write_line("")
+    terminalreporter.write_line("─" * 60)
+    
+    if failed == 0 and errors == 0:
+        terminalreporter.write_line("")
+        terminalreporter.write_line("  ✦ All tests passed! Per aspera ad astra ✦", green=True, bold=True)
+    else:
+        terminalreporter.write_line("")
+        terminalreporter.write_line("  ✗ Some tests failed", red=True, bold=True)
+    
+    terminalreporter.write_line("")
+    terminalreporter.write_line(f"  {'Tests:':<12} {total:>6}")
+    
+    if passed > 0:
+        terminalreporter.write_line(f"  {'Passed:':<12} {passed:>6}", green=True)
+    if failed > 0:
+        terminalreporter.write_line(f"  {'Failed:':<12} {failed:>6}", red=True)
+    if skipped > 0:
+        terminalreporter.write_line(f"  {'Skipped:':<12} {skipped:>6}", yellow=True)
+    if errors > 0:
+        terminalreporter.write_line(f"  {'Errors:':<12} {errors:>6}", red=True)
+    
+    terminalreporter.write_line(f"  {'Pass Rate:':<12} {pass_rate:>5.1f}%")
+    terminalreporter.write_line("")
+
+
 # =============================================================================
 # Test Configuration
 # =============================================================================

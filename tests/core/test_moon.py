@@ -133,7 +133,7 @@ class TestMoonPhase:
             'New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous',
             'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent'
         ]
-        assert phase.name in valid_names
+        assert phase.phase_name.value in valid_names
 
 
 class TestMoonPhaseIllumination:

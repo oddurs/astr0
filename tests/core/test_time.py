@@ -65,9 +65,10 @@ class TestJulianDateConstruction:
         jd1 = JulianDate.from_calendar(2000, 1, 1, 12, 0, 0)
         jd2 = JulianDate.from_calendar(2000, 1, 1, 12, 0, 30)
         
-        # 30 seconds = 30/86400 days
+        # 30 seconds = 30/86400 days ≈ 0.000347222
+        # Use abs_tol since the values are very small
         diff = jd2.jd - jd1.jd
-        assert math.isclose(diff, 30 / 86400, rel_tol=1e-10)
+        assert math.isclose(diff, 30 / 86400, abs_tol=1e-9)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

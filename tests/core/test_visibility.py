@@ -19,9 +19,9 @@ from astr0.core.observer import Observer
 from astr0.core.visibility import (
     airmass, target_altitude, target_azimuth,
     transit_time, transit_altitude_calc, target_rise_set,
-    moon_target_separation, is_night, compute_visibility
+    moon_target_separation, is_night, compute_visibility,
+    TargetVisibility
 )
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  AIRMASS
@@ -71,17 +71,17 @@ class TestAirmass:
         X = airmass(alt)
         assert X > 25
     
-    def test_below_horizon_infinite(self):
-        """Airmass below horizon is infinite."""
+    def test_below_horizon_none(self):
+        """Airmass below horizon is None."""
         alt = Angle(degrees=-5)
         X = airmass(alt)
-        assert X == float('inf')
+        assert X is None
     
-    def test_negative_altitude_infinite(self):
-        """Any negative altitude gives infinite airmass."""
+    def test_negative_altitude_none(self):
+        """Any negative altitude gives None airmass."""
         for deg in [-1, -10, -45, -89]:
             X = airmass(Angle(degrees=deg))
-            assert X == float('inf')
+            assert X is None
 
 
 class TestAirmassThresholds:
@@ -315,13 +315,13 @@ class TestComputeVisibility:
     Tests for comprehensive visibility assessment.
     """
     
-    def test_returns_dict(self, greenwich):
-        """compute_visibility() returns dictionary."""
+    def test_returns_target_visibility(self, greenwich):
+        """compute_visibility() returns TargetVisibility dataclass."""
         target = ICRSCoord.from_degrees(180, 45)
         jd = jd_now()
         
         vis = compute_visibility(target, greenwich, jd)
-        assert isinstance(vis, dict)
+        assert isinstance(vis, TargetVisibility)
     
     def test_includes_altitude(self, greenwich):
         """Result includes current altitude."""
@@ -329,15 +329,16 @@ class TestComputeVisibility:
         jd = jd_now()
         
         vis = compute_visibility(target, greenwich, jd)
-        assert 'altitude' in vis or 'alt' in vis
+        assert hasattr(vis, 'current_altitude')
+        assert isinstance(vis.current_altitude, Angle)
     
     def test_includes_airmass(self, greenwich):
-        """Result includes airmass."""
+        """Result includes airmass (or None if below horizon)."""
         target = ICRSCoord.from_degrees(180, 45)
         jd = jd_now()
         
         vis = compute_visibility(target, greenwich, jd)
-        assert 'airmass' in vis
+        assert hasattr(vis, 'current_airmass')
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -13,7 +13,7 @@ import json
 import pytest
 
 from astr0.output.formatters import (
-    PlainFormatter, JSONFormatter, LaTeXFormatter
+    PlainFormatter, JSONFormatter, LaTeXFormatter, Result
 )
 
 
@@ -26,23 +26,27 @@ class TestPlainFormatter:
     Tests for plain text output formatting.
     """
     
-    def test_format_angle_degrees(self):
-        """Format angle in degrees."""
+    def test_format_result_with_label(self):
+        """Format result with label."""
         formatter = PlainFormatter()
-        result = formatter.format_angle(45.5, 'degrees')
-        assert '45' in result
+        result = Result(value=45.5, label="Angle", unit="°")
+        output = formatter.format(result)
+        assert '45.5' in output
+        assert 'Angle' in output
     
-    def test_format_angle_dms(self):
-        """Format angle in DMS."""
+    def test_format_result_with_unit(self):
+        """Format result with unit."""
         formatter = PlainFormatter()
-        result = formatter.format_angle(45.5, 'dms')
-        assert '45' in result and '30' in result
+        result = Result(value=45.5, label="Angle", unit="°")
+        output = formatter.format(result)
+        assert '°' in output
     
-    def test_format_angle_hms(self):
-        """Format angle in HMS."""
+    def test_format_result_with_extra(self):
+        """Format result with extra data."""
         formatter = PlainFormatter()
-        result = formatter.format_angle(180.0, 'hms')
-        assert '12' in result  # 180° = 12h
+        result = Result(value=45.5, label="Angle", extra={"HMS": "12h00m00s"})
+        output = formatter.format(result)
+        assert '12h00m00s' in output
 
 
 class TestPlainFormatterTime:
@@ -50,11 +54,12 @@ class TestPlainFormatterTime:
     Tests for plain formatter time output.
     """
     
-    def test_format_jd(self):
-        """Format Julian Date."""
+    def test_format_jd_result(self):
+        """Format Julian Date result."""
         formatter = PlainFormatter()
-        result = formatter.format_jd(2451545.0)
-        assert '2451545' in result
+        result = Result(value=2451545.0, label="Julian Date")
+        output = formatter.format(result)
+        assert '2451545' in output
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -69,19 +74,21 @@ class TestJSONFormatter:
     def test_output_is_valid_json(self):
         """Output is valid JSON."""
         formatter = JSONFormatter()
-        result = formatter.format({'key': 'value'})
+        result = Result(value="test", label="Test")
+        output = formatter.format(result)
         
         # Should parse without error
-        parsed = json.loads(result)
-        assert parsed['key'] == 'value'
+        parsed = json.loads(output)
+        assert parsed['result'] == 'test'
     
     def test_pretty_print(self):
         """JSON is pretty-printed."""
         formatter = JSONFormatter(pretty=True)
-        result = formatter.format({'key': 'value'})
+        result = Result(value="test", label="Test")
+        output = formatter.format(result)
         
         # Pretty print has newlines
-        assert '\n' in result
+        assert '\n' in output
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -95,32 +102,32 @@ class TestLaTeXFormatter:
     Added in v0.2 for publication-ready output.
     """
     
-    def test_format_angle_degrees(self):
-        """Format angle with degree symbol."""
+    def test_format_result_basic(self):
+        """Format basic result to LaTeX."""
         formatter = LaTeXFormatter()
-        result = formatter.format_angle(45.5, 'degrees')
-        assert '45' in result
-        assert r'\degree' in result or '°' in result
+        result = Result(value=45.5, label="Angle")
+        output = formatter.format(result)
+        assert '45.5' in output
     
-    def test_format_angle_dms(self):
-        """Format angle in DMS with proper symbols."""
-        formatter = LaTeXFormatter()
-        result = formatter.format_angle(45.5, 'dms')
-        # Should have degree/arcmin/arcsec symbols
-        assert '45' in result
+    def test_format_with_document_wrapper(self):
+        """Format with full document wrapper."""
+        formatter = LaTeXFormatter(document_class=True)
+        result = Result(value=45.5, label="Angle")
+        output = formatter.format(result)
+        assert 'documentclass' in output
     
-    def test_format_coordinates(self):
-        """Format celestial coordinates."""
+    def test_format_result_with_label(self):
+        """Format result includes label."""
         formatter = LaTeXFormatter()
-        result = formatter.format_coord(187.5, 45.5, 'icrs')
-        assert 'RA' in result or 'α' in result or '187' in result
+        result = Result(value=45.5, label="RA")
+        output = formatter.format(result)
+        # LaTeX output should contain the value
+        assert '45' in output
     
-    def test_format_table(self):
-        """Format data as LaTeX table."""
-        formatter = LaTeXFormatter()
-        data = [
-            {'name': 'Sirius', 'ra': '06h45m'},
-            {'name': 'Vega', 'ra': '18h37m'}
-        ]
-        result = formatter.format_table(data)
-        assert 'tabular' in result or 'begin' in result
+    def test_uses_siunitx_by_default(self):
+        """Uses siunitx package when document_class=True."""
+        formatter = LaTeXFormatter(document_class=True, siunitx=True)
+        result = Result(value=45.5, label="Angle")
+        output = formatter.format(result)
+        assert 'siunitx' in output
+

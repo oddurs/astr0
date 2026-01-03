@@ -60,8 +60,16 @@ packages = ["src/astr0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=astr0 --cov-report=term-missing"
+# Default: clean output without coverage spam
+# Use -v for verbose, --cov for coverage
+addopts = "-q --tb=short"
 pythonpath = ["src"]
+# Test collection display
+console_output_style = "progress"
+# Shorter traceback by default
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
 
 [tool.ruff]
 src = ["src"]
