@@ -51,10 +51,11 @@ class AliasedGroup(click.Group):
 
 @click.group(cls=AliasedGroup)
 @click.option('--verbose', '-v', is_flag=True, help='Show calculation steps')
-@click.option('--output', '-o', type=click.Choice(['plain', 'json']), default='plain', help='Output format')
+@click.option('--json', 'json_output', is_flag=True, help='Output in JSON format')
+@click.option('--output', '-o', type=click.Choice(['plain', 'json', 'latex']), default='plain', help='Output format')
 @click.version_option(__version__, prog_name='astr0')
 @click.pass_context
-def main(ctx, verbose: bool, output: str):
+def main(ctx, verbose: bool, json_output: bool, output: str):
     """
     astr0 — Astronomy Calculation Toolkit
     
@@ -67,6 +68,7 @@ def main(ctx, verbose: bool, output: str):
     \b
     Examples:
         astr0 time now
+        astr0 time now --json
         astr0 coords transform "12h30m +45d" --to galactic
         astr0 angles sep "10h +30d" "11h +31d"
     
@@ -76,7 +78,8 @@ def main(ctx, verbose: bool, output: str):
     """
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
-    ctx.obj['output'] = output
+    # --json flag overrides --output
+    ctx.obj['output'] = 'json' if json_output else output
 
 
 # Register command groups
