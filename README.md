@@ -44,10 +44,28 @@ astr0 --verbose coords transform "18h36m56.3s -26d54m32s" --to altaz --lat 34.05
 ## Features
 
 - **Time Conversions**: Julian Date, Modified JD, Local Sidereal Time
-- **Coordinate Transforms**: ICRS, Galactic, Ecliptic, Horizontal (Alt/Az)
+- **Coordinate Transforms**: ICRS, Galactic, Horizontal (Alt/Az)
 - **Angular Calculations**: Separations, position angles
-- **Verbose Mode**: See every step of every calculation
+- **Verbose Mode**: See every step of every calculation ("show your work")
 - **Multiple Outputs**: Plain text, JSON (LaTeX coming soon)
+- **Educational**: Textbook-style explanations in the documentation
+
+## Documentation
+
+📚 **[Full Documentation](docs/index.md)** — Start here!
+
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](docs/getting-started.md) | Installation and first calculations |
+| [Time & Julian Dates](docs/time.md) | Astronomical time systems explained |
+| [Coordinate Systems](docs/coords.md) | ICRS, Galactic, Horizontal transforms |
+| [Angular Calculations](docs/angles.md) | Separations, position angles, conversions |
+| [Astronomical Constants](docs/constants.md) | Reference values with sources |
+| [Verbose Mode](docs/verbose.md) | The "show your work" system |
+| [CLI Reference](docs/cli-reference.md) | Complete command reference |
+| [Python API](docs/api.md) | Using astr0 as a library |
+
+See [ROADMAP.md](ROADMAP.md) for the full vision and upcoming features.
 
 ## Philosophy
 
@@ -55,10 +73,6 @@ astr0 --verbose coords transform "18h36m56.3s -26d54m32s" --to altaz --lat 34.05
 2. **Show Your Work** — `--verbose` mode explains everything
 3. **Test Everything** — Validated against authoritative sources
 4. **Expand Gracefully** — Modular architecture
-
-## Documentation
-
-See [ROADMAP.md](ROADMAP.md) for the full vision and upcoming features.
 
 ## License
 
