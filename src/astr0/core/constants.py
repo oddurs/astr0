@@ -179,6 +179,130 @@ class AstronomicalConstants:
         reference="IAU 2015 (nominal)"
     )
     
+    # Solar position constants (Meeus Ch. 25)
+    SOLAR_MEAN_ANOMALY_J2000 = Constant(
+        name="Solar mean anomaly at J2000.0",
+        value=357.5291092,
+        unit="degrees",
+        reference="Meeus, Astronomical Algorithms"
+    )
+    
+    SOLAR_MEAN_LONGITUDE_J2000 = Constant(
+        name="Solar mean longitude at J2000.0",
+        value=280.46646,
+        unit="degrees",
+        reference="Meeus, Astronomical Algorithms"
+    )
+    
+    SOLAR_ECCENTRICITY_J2000 = Constant(
+        name="Earth orbit eccentricity at J2000.0",
+        value=0.016708634,
+        unit="",
+        reference="Meeus, Astronomical Algorithms"
+    )
+    
+    # Lunar constants
+    LUNAR_MEAN_LONGITUDE_J2000 = Constant(
+        name="Lunar mean longitude at J2000.0",
+        value=218.3165,
+        unit="degrees",
+        reference="Meeus, Astronomical Algorithms"
+    )
+    
+    LUNAR_MEAN_ANOMALY_J2000 = Constant(
+        name="Lunar mean anomaly at J2000.0",
+        value=134.9634,
+        unit="degrees",
+        reference="Meeus, Astronomical Algorithms"
+    )
+    
+    LUNAR_MEAN_ELONGATION_J2000 = Constant(
+        name="Lunar mean elongation at J2000.0",
+        value=297.8502,
+        unit="degrees",
+        reference="Meeus, Astronomical Algorithms"
+    )
+    
+    LUNAR_MEAN_DISTANCE = Constant(
+        name="Lunar mean distance",
+        value=384_400_000.0,
+        unit="m",
+        reference="IAU"
+    )
+    
+    LUNAR_RADIUS = Constant(
+        name="Lunar radius",
+        value=1_737_400.0,
+        unit="m",
+        reference="IAU 2015"
+    )
+    
+    SYNODIC_MONTH = Constant(
+        name="Synodic month (new moon to new moon)",
+        value=29.530588861,
+        unit="days",
+        reference="Meeus, Astronomical Algorithms"
+    )
+    
+    # Rise/set constants
+    SOLAR_APPARENT_RADIUS = Constant(
+        name="Solar apparent radius (mean)",
+        value=0.2666,
+        unit="degrees",
+        reference="Derived from mean distance"
+    )
+    
+    ATMOSPHERIC_REFRACTION_HORIZON = Constant(
+        name="Atmospheric refraction at horizon",
+        value=0.5667,
+        unit="degrees",
+        reference="Meeus, Astronomical Algorithms"
+    )
+    
+    # Standard altitude for rise/set (center of disk accounting for refraction)
+    RISE_SET_ALTITUDE_SUN = Constant(
+        name="Standard altitude for sunrise/sunset",
+        value=-0.8333,
+        unit="degrees",
+        reference="Meeus (refraction + semidiameter)"
+    )
+    
+    RISE_SET_ALTITUDE_MOON = Constant(
+        name="Standard altitude for moonrise/moonset",
+        value=0.125,
+        unit="degrees",
+        reference="Meeus (mean parallax - refraction - semidiameter)"
+    )
+    
+    RISE_SET_ALTITUDE_STARS = Constant(
+        name="Standard altitude for star rise/set",
+        value=-0.5667,
+        unit="degrees",
+        reference="Meeus (refraction only)"
+    )
+    
+    # Twilight altitudes
+    CIVIL_TWILIGHT_ALTITUDE = Constant(
+        name="Civil twilight altitude",
+        value=-6.0,
+        unit="degrees",
+        reference="Standard definition"
+    )
+    
+    NAUTICAL_TWILIGHT_ALTITUDE = Constant(
+        name="Nautical twilight altitude",
+        value=-12.0,
+        unit="degrees",
+        reference="Standard definition"
+    )
+    
+    ASTRONOMICAL_TWILIGHT_ALTITUDE = Constant(
+        name="Astronomical twilight altitude",
+        value=-18.0,
+        unit="degrees",
+        reference="Standard definition"
+    )
+    
     def list_all(self) -> List[Constant]:
         """Return all constants as a list."""
         return [
