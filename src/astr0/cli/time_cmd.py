@@ -58,17 +58,18 @@ def now(ctx):
         gmst_h = int(gmst)
         gmst_m = int((gmst - gmst_h) * 60)
         gmst_s = ((gmst - gmst_h) * 60 - gmst_m) * 60
+        gmst_str = f"{gmst_h:02d}h {gmst_m:02d}m {gmst_s:05.2f}s"
         
         click.echo(f"""
-  ╭──────────────────────────────────────────────╮
-  │  Current Astronomical Time                   │
-  ├──────────────────────────────────────────────┤
-  │  UTC:          {dt.strftime('%Y-%m-%d %H:%M:%S'):>28} │
-  │  Julian Date:  {jd.jd:>28.6f} │
-  │  Modified JD:  {jd.mjd:>28.6f} │
-  │  T (J2000):    {jd.t_j2000:>28.10f} │
-  │  GMST:         {gmst_h:02d}h {gmst_m:02d}m {gmst_s:05.2f}s{' ':>16} │
-  ╰──────────────────────────────────────────────╯
+  ╭────────────────────────────────────────────╮
+  │  Current Astronomical Time                 │
+  ├────────────────────────────────────────────┤
+  │  UTC:          {dt.strftime('%Y-%m-%d %H:%M:%S'):>26} │
+  │  Julian Date:  {jd.jd:>26.6f} │
+  │  Modified JD:  {jd.mjd:>26.6f} │
+  │  T (J2000):    {jd.t_j2000:>26.10f} │
+  │  GMST:         {gmst_str:>26} │
+  ╰────────────────────────────────────────────╯
 """)
         if vctx:
             click.echo(vctx.format_steps())
