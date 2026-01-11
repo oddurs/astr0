@@ -4,7 +4,7 @@ astr0 — Astronomy Calculation Toolkit
 A professional astronomy calculation toolkit with a soul.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.1"
 __author__ = "astr0 contributors"
 
 # Convenient imports for library usage

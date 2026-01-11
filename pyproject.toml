@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "astr0"
-version = "0.1.0"
+version = "0.2.1"
 description = "A professional astronomy calculation toolkit with a soul"
 readme = "README.md"
 license = "MIT"

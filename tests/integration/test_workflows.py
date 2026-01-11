@@ -81,30 +81,31 @@ class TestSunMoonRelationship:
     
     def test_sun_moon_separation_correlates_with_phase(self):
         """Test that Sun-Moon separation varies with phase."""
-        jd = jd_now()
-        
-        # Get phase info
-        phase = moon_phase(jd)
-        
-        # Get positions
-        sun_pos = sun_position(jd)
-        moon_pos = moon_position(jd)
-        
-        # Calculate elongation (Sun-Moon separation)
         from astr0.core.angles import angular_separation
-        elongation = angular_separation(
-            sun_pos.ra, sun_pos.dec,
-            moon_pos.ra, moon_pos.dec
+
+        # Use fixed dates with known lunar phases for reproducible tests
+        # New moon: 2024-01-11 (JD 2460320.5)
+        # Full moon: 2024-01-25 (JD 2460334.5)
+        new_moon_jd = JulianDate(2460320.5)
+        full_moon_jd = JulianDate(2460334.5)
+
+        # Test new moon: elongation should be small
+        sun_new = sun_position(new_moon_jd)
+        moon_new = moon_position(new_moon_jd)
+        elongation_new = angular_separation(
+            sun_new.ra, sun_new.dec,
+            moon_new.ra, moon_new.dec
         )
-        
-        # Elongation should correlate with phase angle
-        # New moon: elongation ≈ 0°
-        # Full moon: elongation ≈ 180°
-        # This is a rough correlation check
-        if phase.phase_angle < 30:
-            assert elongation.degrees < 45
-        elif phase.phase_angle > 150:
-            assert elongation.degrees > 135
+        assert elongation_new.degrees < 45, f"New moon elongation {elongation_new.degrees}° should be < 45°"
+
+        # Test full moon: elongation should be large
+        sun_full = sun_position(full_moon_jd)
+        moon_full = moon_position(full_moon_jd)
+        elongation_full = angular_separation(
+            sun_full.ra, sun_full.dec,
+            moon_full.ra, moon_full.dec
+        )
+        assert elongation_full.degrees > 135, f"Full moon elongation {elongation_full.degrees}° should be > 135°"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
