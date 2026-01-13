@@ -113,6 +113,10 @@ const config: Config = {
       href: 'https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap',
       type: 'text/css',
     },
+    {
+      href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
+      type: 'text/css',
+    },
   ],
 
   plugins: ['docusaurus-plugin-sass'],
