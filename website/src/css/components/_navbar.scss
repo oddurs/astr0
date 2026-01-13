@@ -39,16 +39,19 @@
 
 // External link icon override
 .navbar__link[href^="http"] {
-  svg[class*="external-link"] {
-    display: none;
+  // Hide default Docusaurus external link icon
+  svg {
+    display: none !important;
   }
 
   &::after {
     content: '\f08e';
     font-family: 'Font Awesome 6 Free';
     font-weight: 900;
-    font-size: 0.7em;
+    font-size: 0.8em;
     color: #44515e;
-    margin-left: 0.4em;
+    margin-left: 0.4rem;
+    position: relative;
+    top: -0.1rem;
   }
 }

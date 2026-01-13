@@ -198,9 +198,11 @@ def print_about_banner(version: str) -> None:
         version: Version string to display
     """
     banner = """
-[bold cyan]   __                          [/bold cyan]
-[bold cyan]  (_  _|_  _. ._     .  _. ._ _|[/bold cyan]
-[bold cyan]  __)(  |_(_| |  \\)\\/ (_| | (_| [/bold cyan]
+[bold cyan]     _                                   _ [/bold cyan]
+[bold cyan] ___| |_ __ _ _ ____      ____ _ _ __ __| |[/bold cyan]
+[bold cyan]/ __| __/ _` | '__\\ \\ /\\ / / _` | '__/ _` |[/bold cyan]
+[bold cyan]\\__ \\ || (_| | |   \\ V  V / (_| | | | (_| |[/bold cyan]
+[bold cyan]|___/\\__\\__,_|_|    \\_/\\_/ \\__,_|_|  \\__,_|[/bold cyan]
 """
 
     content = Text()
@@ -381,3 +383,122 @@ def print_all_planets_table(
 
     if vctx:
         print_verbose_steps(vctx)
+
+
+def print_messier_table(
+    title: str,
+    objects: list[dict],
+    show_constellation: bool = True,
+) -> None:
+    """
+    Print styled table of Messier objects.
+
+    Args:
+        title: Table title
+        objects: List of dicts with object info
+        show_constellation: Whether to show constellation column
+    """
+    console.print()
+    console.print(f"[bold cyan]{title}[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold",
+    )
+
+    table.add_column("M#", style="bold yellow", justify="right")
+    table.add_column("Name", style=COLORS['value'], no_wrap=True)
+    table.add_column("Type", style="cyan")
+    table.add_column("Mag", justify="right")
+    if show_constellation:
+        table.add_column("Const", style=COLORS['muted'])
+
+    for obj in objects:
+        # Color magnitude - brighter objects (lower mag) get highlighted
+        mag = obj['magnitude']
+        if mag <= 5.0:
+            mag_text = Text(f"{mag:.1f}", style="bold green")
+        elif mag <= 8.0:
+            mag_text = Text(f"{mag:.1f}", style="white")
+        else:
+            mag_text = Text(f"{mag:.1f}", style="dim")
+
+        row = [
+            f"M{obj['number']}",
+            obj['name'],
+            obj['type'],
+            mag_text,
+        ]
+        if show_constellation:
+            row.append(obj['constellation'])
+
+        table.add_row(*row)
+
+    console.print(table)
+    console.print()
+    console.print(f"  [dim]Total: {len(objects)} objects[/dim]")
+    console.print()
+
+
+def print_messier_detail(
+    number: int,
+    name: str,
+    obj_type: str,
+    ra: str,
+    dec: str,
+    magnitude: float,
+    size: float,
+    distance: str,
+    constellation: str,
+    ngc: str,
+    description: str,
+) -> None:
+    """
+    Print styled detail view of a Messier object.
+
+    Args:
+        number: Messier number
+        name: Object name
+        obj_type: Object type
+        ra: Right ascension formatted
+        dec: Declination formatted
+        magnitude: Visual magnitude
+        size: Angular size in arcmin
+        distance: Distance string or None
+        constellation: Constellation abbreviation
+        ngc: NGC designation or None
+        description: Object description
+    """
+    console.print()
+    console.print(f"  [bold yellow]M{number}[/bold yellow] [dim]—[/dim] [bold cyan]{name}[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    table.add_column(style=COLORS['label'])
+    table.add_column(style=COLORS['value'])
+
+    table.add_row("Type", f"[cyan]{obj_type}[/cyan]")
+    table.add_row("Coordinates", f"{ra}  {dec}")
+
+    # Color magnitude
+    if magnitude <= 5.0:
+        mag_style = "bold green"
+    elif magnitude <= 8.0:
+        mag_style = "white"
+    else:
+        mag_style = "dim"
+    table.add_row("Magnitude", f"[{mag_style}]{magnitude:.1f}[/{mag_style}]")
+
+    table.add_row("Size", f"{size:.1f} arcmin")
+    table.add_row("Distance", distance if distance else "[dim]Unknown[/dim]")
+    table.add_row("Constellation", constellation)
+    table.add_row("NGC", ngc if ngc else "[dim]—[/dim]")
+
+    console.print(table)
+    console.print()
+    console.print(f"  [italic]{description}[/italic]")
+    console.print()

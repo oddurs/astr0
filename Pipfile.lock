@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e1ed69008810c9444f007fcd62e3d02e3ad58104826c4c14cc083157cff2b0ca"
+            "sha256": "3a622b8ec19ae30ad992d9c7ad969d27da07d9a1de8b6b19655f05e74f9c178e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -58,6 +58,11 @@
             "index": "pypi",
             "markers": "python_full_version >= '3.8.0'",
             "version": "==14.2.0"
+        },
+        "starward": {
+            "editable": true,
+            "file": ".",
+            "markers": "python_version >= '3.9'"
         }
     },
     "develop": {

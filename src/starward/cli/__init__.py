@@ -17,6 +17,7 @@ from starward.cli.observer_cmd import observer_group
 from starward.cli.moon_cmd import moon_group
 from starward.cli.vis_cmd import vis_group
 from starward.cli.planets_cmd import planets_group
+from starward.cli.messier_cmd import messier_group
 from starward.core.precision import set_precision, PrecisionLevel
 
 
@@ -45,6 +46,7 @@ class AliasedGroup(click.Group):
             'visibility': 'vis',
             'p': 'planets',
             'planet': 'planets',
+            'mes': 'messier',
         }
         
         if cmd_name in aliases:
@@ -112,6 +114,7 @@ main.add_command(observer_group)
 main.add_command(moon_group)
 main.add_command(vis_group)
 main.add_command(planets_group)
+main.add_command(messier_group)
 
 
 @main.command()
