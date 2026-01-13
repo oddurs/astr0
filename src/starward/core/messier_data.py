@@ -27,6 +27,27 @@ class MessierObject:
     def __repr__(self) -> str:
         return f"M{self.number} ({self.name})"
 
+    @classmethod
+    def from_dict(cls, data: dict) -> 'MessierObject':
+        """Create a MessierObject from a dictionary (database row)."""
+        # Convert ngc_number back to string format if present
+        ngc_number = data.get('ngc_number')
+        ngc_str = f"NGC {ngc_number}" if ngc_number else None
+
+        return cls(
+            number=data['number'],
+            name=data['name'],
+            object_type=data['object_type'],
+            ra_hours=data['ra_hours'],
+            dec_degrees=data['dec_degrees'],
+            magnitude=data['magnitude'],
+            size_arcmin=data['size_arcmin'],
+            distance_kly=data.get('distance_kly'),
+            constellation=data['constellation'],
+            ngc=ngc_str,
+            description=data.get('description', ''),
+        )
+
 
 # Object type constants
 GALAXY = "galaxy"

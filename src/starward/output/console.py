@@ -502,3 +502,894 @@ def print_messier_detail(
     console.print()
     console.print(f"  [italic]{description}[/italic]")
     console.print()
+
+
+def print_ngc_table(
+    title: str,
+    objects: list[dict],
+    show_constellation: bool = True,
+) -> None:
+    """
+    Print styled table of NGC objects.
+
+    Args:
+        title: Table title
+        objects: List of dicts with object info
+        show_constellation: Whether to show constellation column
+    """
+    console.print()
+    console.print(f"[bold cyan]{title}[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold",
+    )
+
+    table.add_column("NGC", style="bold yellow", justify="right")
+    table.add_column("Name", style=COLORS['value'], no_wrap=True)
+    table.add_column("Type", style="cyan")
+    table.add_column("Mag", justify="right")
+    if show_constellation:
+        table.add_column("Const", style=COLORS['muted'])
+    table.add_column("Messier", style="dim", justify="right")
+
+    for obj in objects:
+        # Color magnitude based on brightness
+        mag = obj.get('magnitude')
+        if mag is None:
+            mag_str = "[dim]—[/dim]"
+        elif mag <= 5.0:
+            mag_str = f"[bold green]{mag:.1f}[/bold green]"
+        elif mag <= 8.0:
+            mag_str = f"{mag:.1f}"
+        else:
+            mag_str = f"[dim]{mag:.1f}[/dim]"
+
+        name = obj.get('name') or "[dim]—[/dim]"
+        messier = f"M{obj['messier']}" if obj.get('messier') else ""
+
+        row = [
+            str(obj['number']),
+            name,
+            obj.get('type', ''),
+            mag_str,
+        ]
+        if show_constellation:
+            row.append(obj.get('constellation', ''))
+        row.append(messier)
+
+        table.add_row(*row)
+
+    console.print(table)
+    console.print()
+    console.print(f"  [dim]Total: {len(objects)} objects[/dim]")
+    console.print()
+
+
+def print_ngc_detail(
+    number: int,
+    name: Optional[str],
+    obj_type: str,
+    ra: str,
+    dec: str,
+    magnitude: Optional[float],
+    size: Optional[float],
+    size_minor: Optional[float],
+    distance: Optional[str],
+    constellation: str,
+    messier: Optional[str],
+    hubble_type: Optional[str],
+    description: str,
+) -> None:
+    """
+    Print styled detail view of an NGC object.
+
+    Args:
+        number: NGC number
+        name: Object name or None
+        obj_type: Object type
+        ra: Right ascension formatted
+        dec: Declination formatted
+        magnitude: Visual magnitude or None
+        size: Angular size in arcmin or None
+        size_minor: Minor axis in arcmin or None
+        distance: Distance string or None
+        constellation: Constellation abbreviation
+        messier: Messier designation or None
+        hubble_type: Hubble classification or None
+        description: Object description
+    """
+    console.print()
+    title = f"  [bold yellow]NGC {number}[/bold yellow]"
+    if name:
+        title += f" [dim]—[/dim] [bold cyan]{name}[/bold cyan]"
+    console.print(title)
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    table.add_column(style=COLORS['label'])
+    table.add_column(style=COLORS['value'])
+
+    table.add_row("Type", f"[cyan]{obj_type}[/cyan]")
+    table.add_row("Coordinates", f"{ra}  {dec}")
+
+    # Color magnitude
+    if magnitude is not None:
+        if magnitude <= 5.0:
+            mag_style = "bold green"
+        elif magnitude <= 8.0:
+            mag_style = "white"
+        else:
+            mag_style = "dim"
+        table.add_row("Magnitude", f"[{mag_style}]{magnitude:.1f}[/{mag_style}]")
+    else:
+        table.add_row("Magnitude", "[dim]Unknown[/dim]")
+
+    # Size
+    if size is not None:
+        if size_minor is not None:
+            size_str = f"{size:.1f} × {size_minor:.1f} arcmin"
+        else:
+            size_str = f"{size:.1f} arcmin"
+        table.add_row("Size", size_str)
+    else:
+        table.add_row("Size", "[dim]Unknown[/dim]")
+
+    table.add_row("Distance", distance if distance else "[dim]Unknown[/dim]")
+    table.add_row("Constellation", constellation)
+
+    if messier:
+        table.add_row("Messier", f"[yellow]{messier}[/yellow]")
+
+    if hubble_type:
+        table.add_row("Hubble Type", hubble_type)
+
+    console.print(table)
+    console.print()
+    if description:
+        console.print(f"  [italic]{description}[/italic]")
+    console.print()
+
+
+def print_ngc_stats(stats: dict) -> None:
+    """
+    Print styled NGC catalog statistics.
+
+    Args:
+        stats: Dictionary with catalog statistics
+    """
+    console.print()
+    console.print("[bold cyan]NGC Catalog Statistics[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    # Summary table
+    summary = Table(show_header=False, box=None, padding=(0, 2))
+    summary.add_column(style=COLORS['label'])
+    summary.add_column(style=COLORS['value'])
+
+    summary.add_row("Total Objects", f"[bold]{stats['total']:,}[/bold]")
+    summary.add_row("With Common Name", str(stats.get('with_common_name', 0)))
+    summary.add_row("With Messier ID", str(stats.get('with_messier_designation', 0)))
+
+    console.print(summary)
+    console.print()
+
+    # Objects by type
+    console.print("  [bold]Objects by Type[/bold]")
+    by_type = stats.get('by_type', {})
+    type_table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+    type_table.add_column(style="cyan")
+    type_table.add_column(style=COLORS['value'], justify="right")
+
+    for obj_type, count in sorted(by_type.items(), key=lambda x: -x[1])[:10]:
+        type_name = obj_type.replace("_", " ").title()
+        type_table.add_row(type_name, str(count))
+
+    console.print(type_table)
+    console.print()
+
+    # Top constellations
+    top_const = stats.get('top_constellations', {})
+    if top_const:
+        console.print("  [bold]Top Constellations[/bold]")
+        const_table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+        const_table.add_column(style="cyan")
+        const_table.add_column(style=COLORS['value'], justify="right")
+
+        for const, count in list(top_const.items())[:5]:
+            const_table.add_row(const, str(count))
+
+        console.print(const_table)
+        console.print()
+
+
+def print_ic_table(
+    title: str,
+    objects: list[dict],
+    show_constellation: bool = True,
+) -> None:
+    """
+    Print styled table of IC objects.
+
+    Args:
+        title: Table title
+        objects: List of dicts with object info
+        show_constellation: Whether to show constellation column
+    """
+    console.print()
+    console.print(f"[bold cyan]{title}[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold",
+    )
+
+    table.add_column("IC", style="bold yellow", justify="right")
+    table.add_column("Name", style=COLORS['value'], no_wrap=True)
+    table.add_column("Type", style="cyan")
+    table.add_column("Mag", justify="right")
+    if show_constellation:
+        table.add_column("Const", style=COLORS['muted'])
+    table.add_column("NGC", style="dim", justify="right")
+
+    for obj in objects:
+        # Color magnitude based on brightness
+        mag = obj.get('magnitude')
+        if mag is None:
+            mag_str = "[dim]—[/dim]"
+        elif mag <= 5.0:
+            mag_str = f"[bold green]{mag:.1f}[/bold green]"
+        elif mag <= 8.0:
+            mag_str = f"{mag:.1f}"
+        else:
+            mag_str = f"[dim]{mag:.1f}[/dim]"
+
+        name = obj.get('name') or "[dim]—[/dim]"
+        ngc = f"NGC {obj['ngc']}" if obj.get('ngc') else ""
+
+        row = [
+            str(obj['number']),
+            name,
+            obj.get('type', ''),
+            mag_str,
+        ]
+        if show_constellation:
+            row.append(obj.get('constellation', ''))
+        row.append(ngc)
+
+        table.add_row(*row)
+
+    console.print(table)
+    console.print()
+    console.print(f"  [dim]Total: {len(objects)} objects[/dim]")
+    console.print()
+
+
+def print_ic_detail(
+    number: int,
+    name: Optional[str],
+    obj_type: str,
+    ra: str,
+    dec: str,
+    magnitude: Optional[float],
+    size: Optional[float],
+    size_minor: Optional[float],
+    distance: Optional[str],
+    constellation: str,
+    ngc: Optional[str],
+    hubble_type: Optional[str],
+    description: str,
+) -> None:
+    """
+    Print styled detail view of an IC object.
+
+    Args:
+        number: IC number
+        name: Object name or None
+        obj_type: Object type
+        ra: Right ascension formatted
+        dec: Declination formatted
+        magnitude: Visual magnitude or None
+        size: Angular size in arcmin or None
+        size_minor: Minor axis in arcmin or None
+        distance: Distance string or None
+        constellation: Constellation abbreviation
+        ngc: NGC designation or None
+        hubble_type: Hubble classification or None
+        description: Object description
+    """
+    console.print()
+    title = f"  [bold yellow]IC {number}[/bold yellow]"
+    if name:
+        title += f" [dim]—[/dim] [bold cyan]{name}[/bold cyan]"
+    console.print(title)
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    table.add_column(style=COLORS['label'])
+    table.add_column(style=COLORS['value'])
+
+    table.add_row("Type", f"[cyan]{obj_type}[/cyan]")
+    table.add_row("Coordinates", f"{ra}  {dec}")
+
+    # Color magnitude
+    if magnitude is not None:
+        if magnitude <= 5.0:
+            mag_style = "bold green"
+        elif magnitude <= 8.0:
+            mag_style = "white"
+        else:
+            mag_style = "dim"
+        table.add_row("Magnitude", f"[{mag_style}]{magnitude:.1f}[/{mag_style}]")
+    else:
+        table.add_row("Magnitude", "[dim]Unknown[/dim]")
+
+    # Size
+    if size is not None:
+        if size_minor is not None:
+            size_str = f"{size:.1f} × {size_minor:.1f} arcmin"
+        else:
+            size_str = f"{size:.1f} arcmin"
+        table.add_row("Size", size_str)
+    else:
+        table.add_row("Size", "[dim]Unknown[/dim]")
+
+    table.add_row("Distance", distance if distance else "[dim]Unknown[/dim]")
+    table.add_row("Constellation", constellation)
+
+    if ngc:
+        table.add_row("NGC", f"[yellow]{ngc}[/yellow]")
+
+    if hubble_type:
+        table.add_row("Hubble Type", hubble_type)
+
+    console.print(table)
+    console.print()
+    if description:
+        console.print(f"  [italic]{description}[/italic]")
+    console.print()
+
+
+def print_ic_stats(stats: dict) -> None:
+    """
+    Print styled IC catalog statistics.
+
+    Args:
+        stats: Dictionary with catalog statistics
+    """
+    console.print()
+    console.print("[bold cyan]IC Catalog Statistics[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    # Summary table
+    summary = Table(show_header=False, box=None, padding=(0, 2))
+    summary.add_column(style=COLORS['label'])
+    summary.add_column(style=COLORS['value'])
+
+    summary.add_row("Total Objects", f"[bold]{stats['total']:,}[/bold]")
+    summary.add_row("With Common Name", str(stats.get('with_common_name', 0)))
+    summary.add_row("With NGC ID", str(stats.get('with_ngc_designation', 0)))
+
+    console.print(summary)
+    console.print()
+
+    # Objects by type
+    console.print("  [bold]Objects by Type[/bold]")
+    by_type = stats.get('by_type', {})
+    type_table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+    type_table.add_column(style="cyan")
+    type_table.add_column(style=COLORS['value'], justify="right")
+
+    for obj_type, count in sorted(by_type.items(), key=lambda x: -x[1])[:10]:
+        type_name = obj_type.replace("_", " ").title()
+        type_table.add_row(type_name, str(count))
+
+    console.print(type_table)
+    console.print()
+
+    # Top constellations
+    top_const = stats.get('top_constellations', {})
+    if top_const:
+        console.print("  [bold]Top Constellations[/bold]")
+        const_table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+        const_table.add_column(style="cyan")
+        const_table.add_column(style=COLORS['value'], justify="right")
+
+        for const, count in list(top_const.items())[:5]:
+            const_table.add_row(const, str(count))
+
+        console.print(const_table)
+        console.print()
+
+
+# =============================================================================
+# Hipparcos Star Catalog Output
+# =============================================================================
+
+def print_stars_table(
+    title: str,
+    stars: list[dict],
+    show_constellation: bool = True,
+) -> None:
+    """
+    Print styled table of Hipparcos stars.
+
+    Args:
+        title: Table title
+        stars: List of dicts with star info
+        show_constellation: Whether to show constellation column
+    """
+    console.print()
+    console.print(f"[bold cyan]{title}[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold",
+    )
+
+    table.add_column("HIP", style="dim", justify="right")
+    table.add_column("Name", style="bold yellow", no_wrap=True)
+    table.add_column("Mag", justify="right")
+    table.add_column("Spectral", style="cyan")
+    if show_constellation:
+        table.add_column("Const", style=COLORS['muted'])
+    table.add_column("Distance", justify="right")
+
+    for star in stars:
+        # Color magnitude based on brightness
+        mag = star.get('magnitude')
+        if mag is None:
+            mag_str = "[dim]—[/dim]"
+        elif mag < 0:
+            mag_str = f"[bold magenta]{mag:.2f}[/bold magenta]"
+        elif mag <= 1.0:
+            mag_str = f"[bold green]{mag:.2f}[/bold green]"
+        elif mag <= 3.0:
+            mag_str = f"[green]{mag:.2f}[/green]"
+        else:
+            mag_str = f"{mag:.2f}"
+
+        # Format distance
+        dist = star.get('distance')
+        if dist is not None:
+            dist_str = f"{dist:.1f} ly"
+        else:
+            dist_str = "[dim]—[/dim]"
+
+        name = star.get('name', f"HIP {star.get('hip', '')}")
+
+        row = [
+            str(star.get('hip', '')),
+            name,
+            mag_str,
+            star.get('spectral', '') or "[dim]—[/dim]",
+        ]
+        if show_constellation:
+            row.append(star.get('constellation', ''))
+        row.append(dist_str)
+
+        table.add_row(*row)
+
+    console.print(table)
+    console.print()
+    console.print(f"  [dim]Total: {len(stars)} stars[/dim]")
+    console.print()
+
+
+def print_star_detail(
+    hip_number: int,
+    name: Optional[str],
+    bayer: Optional[str],
+    flamsteed: Optional[int],
+    ra: str,
+    dec: str,
+    magnitude: float,
+    bv_color: Optional[float],
+    spectral_type: Optional[str],
+    parallax: Optional[float],
+    distance_ly: Optional[float],
+    proper_motion_ra: Optional[float],
+    proper_motion_dec: Optional[float],
+    radial_velocity: Optional[float],
+    constellation: str,
+) -> None:
+    """
+    Print styled detail view of a Hipparcos star.
+
+    Args:
+        hip_number: Hipparcos catalog number
+        name: Common name or None
+        bayer: Bayer designation or None
+        flamsteed: Flamsteed number or None
+        ra: Right ascension formatted
+        dec: Declination formatted
+        magnitude: Visual magnitude
+        bv_color: B-V color index or None
+        spectral_type: Spectral classification or None
+        parallax: Parallax in mas or None
+        distance_ly: Distance in light-years or None
+        proper_motion_ra: Proper motion in RA or None
+        proper_motion_dec: Proper motion in Dec or None
+        radial_velocity: Radial velocity or None
+        constellation: Constellation abbreviation
+    """
+    console.print()
+    title = f"  [bold yellow]HIP {hip_number}[/bold yellow]"
+    if name:
+        title += f" [dim]—[/dim] [bold cyan]{name}[/bold cyan]"
+    console.print(title)
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    table.add_column(style=COLORS['label'])
+    table.add_column(style=COLORS['value'])
+
+    # Designations
+    if bayer:
+        table.add_row("Bayer", bayer)
+    if flamsteed and constellation:
+        table.add_row("Flamsteed", f"{flamsteed} {constellation}")
+
+    table.add_row("Coordinates", f"{ra}  {dec}")
+
+    # Color magnitude based on brightness
+    if magnitude < 0:
+        mag_style = "bold magenta"
+    elif magnitude <= 1.0:
+        mag_style = "bold green"
+    elif magnitude <= 3.0:
+        mag_style = "green"
+    else:
+        mag_style = "white"
+    table.add_row("Magnitude", f"[{mag_style}]{magnitude:.2f}[/{mag_style}]")
+
+    if spectral_type:
+        table.add_row("Spectral Type", f"[cyan]{spectral_type}[/cyan]")
+
+    if bv_color is not None:
+        # Color B-V based on actual star color
+        if bv_color < 0:
+            bv_style = "blue"
+        elif bv_color < 0.3:
+            bv_style = "white"
+        elif bv_color < 0.6:
+            bv_style = "yellow"
+        elif bv_color < 1.0:
+            bv_style = "bright_red"
+        else:
+            bv_style = "red"
+        table.add_row("B-V Color", f"[{bv_style}]{bv_color:+.2f}[/{bv_style}]")
+
+    table.add_row("Constellation", constellation)
+
+    console.print(table)
+    console.print()
+
+    # Astrometric data section
+    if parallax is not None or distance_ly is not None or proper_motion_ra is not None:
+        console.print("  [bold]Astrometric Data[/bold]")
+        astro_table = Table(show_header=False, box=None, padding=(0, 2))
+        astro_table.add_column(style=COLORS['label'])
+        astro_table.add_column(style=COLORS['value'])
+
+        if distance_ly is not None:
+            if distance_ly < 50:
+                dist_style = "bold green"
+            elif distance_ly < 200:
+                dist_style = "green"
+            else:
+                dist_style = "white"
+            astro_table.add_row("Distance", f"[{dist_style}]{distance_ly:.1f} light-years[/{dist_style}]")
+
+        if parallax is not None:
+            astro_table.add_row("Parallax", f"{parallax:.2f} mas")
+
+        if proper_motion_ra is not None and proper_motion_dec is not None:
+            astro_table.add_row("Proper Motion",
+                f"RA: {proper_motion_ra:+.2f} mas/yr  Dec: {proper_motion_dec:+.2f} mas/yr")
+
+        if radial_velocity is not None:
+            rv_style = "green" if radial_velocity < 0 else "red"
+            astro_table.add_row("Radial Velocity", f"[{rv_style}]{radial_velocity:+.1f} km/s[/{rv_style}]")
+
+        console.print(astro_table)
+    console.print()
+
+
+def print_stars_stats(stats: dict) -> None:
+    """
+    Print styled Hipparcos catalog statistics.
+
+    Args:
+        stats: Dictionary with catalog statistics
+    """
+    console.print()
+    console.print("[bold cyan]Hipparcos Catalog Statistics[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    # Summary table
+    summary = Table(show_header=False, box=None, padding=(0, 2))
+    summary.add_column(style=COLORS['label'])
+    summary.add_column(style=COLORS['value'])
+
+    summary.add_row("Total Stars", f"[bold]{stats['total']:,}[/bold]")
+    summary.add_row("With Common Name", str(stats.get('with_common_name', 0)))
+
+    # Brightest star
+    brightest = stats.get('brightest')
+    if brightest:
+        summary.add_row("Brightest Star",
+            f"[yellow]{brightest['name']}[/yellow] (mag {brightest['magnitude']:.2f})")
+
+    # Magnitude range
+    mag_range = stats.get('magnitude_range', {})
+    if mag_range:
+        summary.add_row("Magnitude Range",
+            f"{mag_range.get('min', '?'):.2f} to {mag_range.get('max', '?'):.2f}")
+
+    console.print(summary)
+    console.print()
+
+    # Stars by spectral class
+    console.print("  [bold]Stars by Spectral Class[/bold]")
+    by_spectral = stats.get('by_spectral_class', {})
+    spectral_table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+    spectral_table.add_column(style="cyan")
+    spectral_table.add_column(style=COLORS['value'], justify="right")
+
+    # Sort by standard spectral order
+    spectral_order = ['O', 'B', 'A', 'F', 'G', 'K', 'M']
+    for sp in spectral_order:
+        if sp in by_spectral:
+            spectral_table.add_row(f"Class {sp}", str(by_spectral[sp]))
+    # Add any others
+    for sp, count in sorted(by_spectral.items()):
+        if sp not in spectral_order:
+            spectral_table.add_row(f"Class {sp}", str(count))
+
+    console.print(spectral_table)
+    console.print()
+
+    # Top constellations
+    top_const = stats.get('top_constellations', {})
+    if top_const:
+        console.print("  [bold]Top Constellations[/bold]")
+        const_table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+        const_table.add_column(style="cyan")
+        const_table.add_column(style=COLORS['value'], justify="right")
+
+        for const, count in list(top_const.items())[:5]:
+            const_table.add_row(const, str(count))
+
+        console.print(const_table)
+        console.print()
+
+
+# =============================================================================
+# Caldwell Catalog Output
+# =============================================================================
+
+def print_caldwell_table(
+    title: str,
+    objects: list[dict],
+    show_constellation: bool = True,
+) -> None:
+    """
+    Print styled table of Caldwell objects.
+
+    Args:
+        title: Table title
+        objects: List of dicts with object info
+        show_constellation: Whether to show constellation column
+    """
+    console.print()
+    console.print(f"[bold cyan]{title}[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold",
+    )
+
+    table.add_column("C", style="bold yellow", justify="right")
+    table.add_column("Name", style=COLORS['value'], no_wrap=True)
+    table.add_column("Type", style="cyan")
+    table.add_column("Mag", justify="right")
+    if show_constellation:
+        table.add_column("Const", style=COLORS['muted'])
+    table.add_column("NGC/IC", style="dim", justify="right")
+
+    for obj in objects:
+        # Color magnitude based on brightness
+        mag = obj.get('magnitude')
+        if mag is None:
+            mag_str = "[dim]—[/dim]"
+        elif mag <= 5.0:
+            mag_str = f"[bold green]{mag:.1f}[/bold green]"
+        elif mag <= 8.0:
+            mag_str = f"{mag:.1f}"
+        else:
+            mag_str = f"[dim]{mag:.1f}[/dim]"
+
+        name = obj.get('name') or "[dim]—[/dim]"
+
+        # NGC/IC cross-reference
+        cross_ref = ""
+        if obj.get('ngc'):
+            cross_ref = f"NGC {obj['ngc']}"
+        elif obj.get('ic'):
+            cross_ref = f"IC {obj['ic']}"
+
+        row = [
+            str(obj['number']),
+            name,
+            obj.get('type', ''),
+            mag_str,
+        ]
+        if show_constellation:
+            row.append(obj.get('constellation', ''))
+        row.append(cross_ref)
+
+        table.add_row(*row)
+
+    console.print(table)
+    console.print()
+    console.print(f"  [dim]Total: {len(objects)} objects[/dim]")
+    console.print()
+
+
+def print_caldwell_detail(
+    number: int,
+    name: Optional[str],
+    obj_type: str,
+    ra: str,
+    dec: str,
+    magnitude: Optional[float],
+    size: Optional[float],
+    size_minor: Optional[float],
+    distance: Optional[str],
+    constellation: str,
+    ngc: Optional[str],
+    ic: Optional[str],
+    description: str,
+) -> None:
+    """
+    Print styled detail view of a Caldwell object.
+
+    Args:
+        number: Caldwell number
+        name: Object name or None
+        obj_type: Object type
+        ra: Right ascension formatted
+        dec: Declination formatted
+        magnitude: Visual magnitude or None
+        size: Angular size in arcmin or None
+        size_minor: Minor axis in arcmin or None
+        distance: Distance string or None
+        constellation: Constellation abbreviation
+        ngc: NGC designation or None
+        ic: IC designation or None
+        description: Object description
+    """
+    console.print()
+    title = f"  [bold yellow]C {number}[/bold yellow]"
+    if name:
+        title += f" [dim]—[/dim] [bold cyan]{name}[/bold cyan]"
+    console.print(title)
+    console.rule(style="dim")
+    console.print()
+
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    table.add_column(style=COLORS['label'])
+    table.add_column(style=COLORS['value'])
+
+    table.add_row("Type", f"[cyan]{obj_type}[/cyan]")
+    table.add_row("Coordinates", f"{ra}  {dec}")
+
+    # Color magnitude
+    if magnitude is not None:
+        if magnitude <= 5.0:
+            mag_style = "bold green"
+        elif magnitude <= 8.0:
+            mag_style = "white"
+        else:
+            mag_style = "dim"
+        table.add_row("Magnitude", f"[{mag_style}]{magnitude:.1f}[/{mag_style}]")
+    else:
+        table.add_row("Magnitude", "[dim]Unknown[/dim]")
+
+    # Size
+    if size is not None:
+        if size_minor is not None:
+            size_str = f"{size:.1f} × {size_minor:.1f} arcmin"
+        else:
+            size_str = f"{size:.1f} arcmin"
+        table.add_row("Size", size_str)
+    else:
+        table.add_row("Size", "[dim]Unknown[/dim]")
+
+    table.add_row("Distance", distance if distance else "[dim]Unknown[/dim]")
+    table.add_row("Constellation", constellation)
+
+    if ngc:
+        table.add_row("NGC", f"[yellow]{ngc}[/yellow]")
+
+    if ic:
+        table.add_row("IC", f"[yellow]{ic}[/yellow]")
+
+    console.print(table)
+    console.print()
+    if description:
+        console.print(f"  [italic]{description}[/italic]")
+    console.print()
+
+
+def print_caldwell_stats(stats: dict) -> None:
+    """
+    Print styled Caldwell catalog statistics.
+
+    Args:
+        stats: Dictionary with catalog statistics
+    """
+    console.print()
+    console.print("[bold cyan]Caldwell Catalog Statistics[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    # Summary table
+    summary = Table(show_header=False, box=None, padding=(0, 2))
+    summary.add_column(style=COLORS['label'])
+    summary.add_column(style=COLORS['value'])
+
+    summary.add_row("Total Objects", f"[bold]{stats['total']:,}[/bold]")
+    summary.add_row("With Common Name", str(stats.get('with_common_name', 0)))
+    summary.add_row("With NGC ID", str(stats.get('with_ngc_designation', 0)))
+    summary.add_row("With IC ID", str(stats.get('with_ic_designation', 0)))
+
+    console.print(summary)
+    console.print()
+
+    # Objects by type
+    console.print("  [bold]Objects by Type[/bold]")
+    by_type = stats.get('by_type', {})
+    type_table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+    type_table.add_column(style="cyan")
+    type_table.add_column(style=COLORS['value'], justify="right")
+
+    for obj_type, count in sorted(by_type.items(), key=lambda x: -x[1])[:10]:
+        type_name = obj_type.replace("_", " ").title()
+        type_table.add_row(type_name, str(count))
+
+    console.print(type_table)
+    console.print()
+
+    # Top constellations
+    top_const = stats.get('top_constellations', {})
+    if top_const:
+        console.print("  [bold]Top Constellations[/bold]")
+        const_table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
+        const_table.add_column(style="cyan")
+        const_table.add_column(style=COLORS['value'], justify="right")
+
+        for const, count in list(top_const.items())[:5]:
+            const_table.add_row(const, str(count))
+
+        console.print(const_table)
+        console.print()

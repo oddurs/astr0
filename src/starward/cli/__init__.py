@@ -18,6 +18,10 @@ from starward.cli.moon_cmd import moon_group
 from starward.cli.vis_cmd import vis_group
 from starward.cli.planets_cmd import planets_group
 from starward.cli.messier_cmd import messier_group
+from starward.cli.ngc_cmd import ngc_group
+from starward.cli.ic_cmd import ic_group
+from starward.cli.stars_cmd import stars_group
+from starward.cli.caldwell_cmd import caldwell_group
 from starward.core.precision import set_precision, PrecisionLevel
 
 
@@ -47,6 +51,12 @@ class AliasedGroup(click.Group):
             'p': 'planets',
             'planet': 'planets',
             'mes': 'messier',
+            'n': 'ngc',
+            'i': 'ic',
+            'star': 'stars',
+            'hip': 'stars',
+            'cal': 'caldwell',
+            'cw': 'caldwell',
         }
         
         if cmd_name in aliases:
@@ -115,6 +125,10 @@ main.add_command(moon_group)
 main.add_command(vis_group)
 main.add_command(planets_group)
 main.add_command(messier_group)
+main.add_command(ngc_group)
+main.add_command(ic_group)
+main.add_command(stars_group)
+main.add_command(caldwell_group)
 
 
 @main.command()
