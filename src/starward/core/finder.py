@@ -5,6 +5,30 @@ This module provides unified search across all astronomical catalogs
 (NGC, IC, Messier, Caldwell, Hipparcos) with filtering by type,
 constellation, magnitude, and other criteria.
 
+Why Multiple Catalogs?
+    Astronomical objects have accumulated different designations over centuries:
+
+    - MESSIER (M): 110 objects, best showpieces visible from France
+    - NGC: ~7,840 objects, the professional standard since 1888
+    - IC: ~5,386 objects, two supplements to NGC (1895, 1908)
+    - CALDWELL: 109 objects, southern sky additions to Messier
+    - HIPPARCOS: ~118,000 stars with precise positions
+
+    The same object may appear in multiple catalogs:
+    - M31 = NGC 224 = Andromeda Galaxy
+    - M1 = NGC 1952 = Crab Nebula
+    - NGC 869/884 = C14 = Double Cluster
+
+Magnitude System:
+    Brightness is measured on a logarithmic scale where LOWER = BRIGHTER.
+    Each magnitude step is a factor of ~2.512 in brightness.
+
+    - Sirius (brightest star): -1.46
+    - Naked-eye limit: ~6.0
+    - Binocular limit: ~10.0
+    - Small telescope: ~13.0
+    - Large amateur scope: ~15-16
+
 Example:
     >>> from starward.core.finder import find, find_by_type
     >>> results = find("orion", limit=10)
