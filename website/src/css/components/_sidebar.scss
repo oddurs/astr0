@@ -1,5 +1,13 @@
 // Sidebar styles
 
+// Sidebar logo (when navbar scrolls away)
+[class*='sidebarLogo'] {
+  img {
+    height: calc(var(--ifm-navbar-height) * 0.24) !important;
+    margin-bottom: 0.1rem;
+  }
+}
+
 :root {
   --doc-sidebar-width: 280px;
   --ifm-menu-color: #e6eaef;
@@ -24,6 +32,7 @@
 
   &--sublist-caret::after {
     background-size: 1.5rem 1.5rem;
+    filter: brightness(0) saturate(100%) invert(31%) sepia(10%) saturate(748%) hue-rotate(169deg) brightness(93%) contrast(89%);
   }
 
   // Category labels
@@ -53,11 +62,15 @@ button[class*='collapseSidebarButton'] {
   padding: 10px !important;
 
   svg {
-    width: 20px !important;
-    height: 20px !important;
-    stroke-width: 1.5;
-    display: block !important;
-    overflow: visible !important;
+    display: none !important;
+  }
+
+  &::before {
+    content: '\f100';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 1rem;
+    color: #44515e;
   }
 }
 
