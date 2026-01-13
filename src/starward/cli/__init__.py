@@ -23,6 +23,7 @@ from starward.cli.ic_cmd import ic_group
 from starward.cli.stars_cmd import stars_group
 from starward.cli.caldwell_cmd import caldwell_group
 from starward.cli.finder_cmd import find_group
+from starward.cli.list_cmd import list_group
 from starward.core.precision import set_precision, PrecisionLevel
 
 
@@ -60,6 +61,8 @@ class AliasedGroup(click.Group):
             'cw': 'caldwell',
             'f': 'find',
             'search': 'find',
+            'l': 'list',
+            'lists': 'list',
         }
         
         if cmd_name in aliases:
@@ -133,6 +136,7 @@ main.add_command(ic_group)
 main.add_command(stars_group)
 main.add_command(caldwell_group)
 main.add_command(find_group)
+main.add_command(list_group)
 
 
 @main.command()

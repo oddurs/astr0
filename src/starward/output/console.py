@@ -1488,3 +1488,108 @@ def print_finder_table(
     console.print()
     console.print(f"  [dim]Found: {len(results)} objects[/dim]")
     console.print()
+
+# =============================================================================
+# Observation List Output
+# =============================================================================
+
+def print_lists_table(lists: list) -> None:
+    """
+    Print styled table of observation lists.
+
+    Args:
+        lists: List of ObservationList objects
+    """
+    console.print()
+    console.print("[bold cyan]Observation Lists[/bold cyan]")
+    console.rule(style="dim")
+    console.print()
+
+    if not lists:
+        console.print("  [dim]No lists found. Create one with:[/dim]")
+        console.print('  [yellow]starward list create "My List"[/yellow]')
+        console.print()
+        return
+
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold",
+    )
+
+    table.add_column("Name", style="bold yellow")
+    table.add_column("Objects", justify="right")
+    table.add_column("Description", style=COLORS['muted'])
+    table.add_column("Updated", style="dim")
+
+    for lst in lists:
+        item_count = len(lst)
+        count_style = "bold green" if item_count > 0 else "dim"
+
+        table.add_row(
+            lst.name,
+            f"[{count_style}]{item_count}[/{count_style}]",
+            lst.description or "[dim]—[/dim]",
+            lst.updated_at.strftime("%Y-%m-%d"),
+        )
+
+    console.print(table)
+    console.print()
+    console.print(f"  [dim]Total: {len(lists)} lists[/dim]")
+    console.print()
+
+
+def print_list_detail(obs_list) -> None:
+    """
+    Print styled detail view of an observation list.
+
+    Args:
+        obs_list: ObservationList object
+    """
+    console.print()
+    title = f"  [bold yellow]{obs_list.name}[/bold yellow]"
+    if obs_list.description:
+        title += f" [dim]—[/dim] [italic]{obs_list.description}[/italic]"
+    console.print(title)
+    console.rule(style="dim")
+    console.print()
+
+    if not obs_list.items:
+        console.print("  [dim]No items in this list. Add objects with:[/dim]")
+        console.print(f'  [yellow]starward list add "{obs_list.name}" M31[/yellow]')
+        console.print()
+        return
+
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold",
+    )
+
+    table.add_column("#", style="dim", justify="right")
+    table.add_column("Object", style="bold yellow")
+    table.add_column("Name", style=COLORS['value'])
+    table.add_column("Notes", style=COLORS['muted'])
+
+    for i, item in enumerate(obs_list.items, 1):
+        table.add_row(
+            str(i),
+            item.designation,
+            item.display_name or "[dim]—[/dim]",
+            item.notes or "[dim]—[/dim]",
+        )
+
+    console.print(table)
+    console.print()
+    console.print(f"  [dim]{len(obs_list.items)} objects • Created {obs_list.created_at.strftime('%Y-%m-%d')}[/dim]")
+    console.print()
+
+
+def print_success(message: str) -> None:
+    """Print a success message."""
+    console.print(f"[bold green]✓[/bold green] {message}")
+
+
+def print_error(message: str) -> None:
+    """Print an error message."""
+    console.print(f"[bold red]✗[/bold red] {message}")
