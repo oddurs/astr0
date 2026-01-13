@@ -1,8 +1,50 @@
-import { themes as prismThemes } from 'prism-react-renderer';
+import { themes as prismThemes, type PrismTheme } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+
+// Absent Contrast dark theme for Prism
+const absentContrastTheme: PrismTheme = {
+  plain: {
+    color: '#aeb9c4',
+    backgroundColor: '#0d1013',
+  },
+  styles: [
+    {
+      types: ['comment', 'prolog', 'doctype', 'cdata'],
+      style: { color: '#44515e' },
+    },
+    {
+      types: ['punctuation'],
+      style: { color: '#7a8b99' },
+    },
+    {
+      types: ['property', 'tag', 'boolean', 'number', 'constant', 'symbol'],
+      style: { color: '#61bcc6' },
+    },
+    {
+      types: ['selector', 'attr-name', 'string', 'char', 'builtin'],
+      style: { color: '#addbbc' },
+    },
+    {
+      types: ['operator', 'entity', 'url'],
+      style: { color: '#aeb9c4' },
+    },
+    {
+      types: ['atrule', 'attr-value', 'keyword'],
+      style: { color: '#228a96' },
+    },
+    {
+      types: ['function', 'class-name'],
+      style: { color: '#e6eaef' },
+    },
+    {
+      types: ['regex', 'important', 'variable'],
+      style: { color: '#6ba77f' },
+    },
+  ],
+};
 
 const config: Config = {
   title: 'astr0',
@@ -73,6 +115,8 @@ const config: Config = {
     },
   ],
 
+  plugins: ['docusaurus-plugin-sass'],
+
   presets: [
     [
       'classic',
@@ -81,7 +125,7 @@ const config: Config = {
           path: '../docs',
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/oddurs/astr0/tree/master/',
-          routeBasePath: '/',
+          routeBasePath: 'docs',
           showLastUpdateTime: true,
           showLastUpdateAuthor: true,
           breadcrumbs: true,
@@ -91,9 +135,16 @@ const config: Config = {
           ],
           rehypePlugins: [rehypeKatex],
         },
-        blog: false,
+        blog: {
+          showReadingTime: true,
+          blogTitle: 'astr0 Blog',
+          blogDescription: 'Release notes and updates for astr0',
+          postsPerPage: 10,
+          blogSidebarTitle: 'Recent Posts',
+          blogSidebarCount: 'ALL',
+        },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: './src/css/custom.scss',
         },
         sitemap: {
           lastmod: 'date',
@@ -116,7 +167,7 @@ const config: Config = {
     // Announcement bar for v0.3.0 release
     announcementBar: {
       id: 'v0.3.0',
-      content: 'astr0 v0.3.0 released with planets module! <a href="/astr0/module-guides/planets">Learn more</a>',
+      content: 'astr0 v0.3.0 released with planets module! <a href="/astr0/docs/module-guides/planets">Learn more</a>',
       backgroundColor: '#7c3aed',
       textColor: '#ffffff',
       isCloseable: true,
@@ -131,6 +182,11 @@ const config: Config = {
           sidebarId: 'docs',
           position: 'left',
           label: 'Documentation',
+        },
+        {
+          to: '/blog',
+          label: 'Blog',
+          position: 'left',
         },
         {
           href: 'https://github.com/oddurs/astr0',
@@ -189,8 +245,8 @@ const config: Config = {
     },
 
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: absentContrastTheme,
+      darkTheme: absentContrastTheme,
       additionalLanguages: ['bash', 'python', 'json', 'toml', 'diff'],
       magicComments: [
         {
@@ -206,9 +262,9 @@ const config: Config = {
     },
 
     colorMode: {
-      defaultMode: 'light',
-      disableSwitch: false,
-      respectPrefersColorScheme: true,
+      defaultMode: 'dark',
+      disableSwitch: true,
+      respectPrefersColorScheme: false,
     },
   } satisfies Preset.ThemeConfig,
 
