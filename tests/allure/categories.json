@@ -1,0 +1,36 @@
+[
+  {
+    "name": "Golden Test Failures",
+    "description": "Tests against authoritative reference values (JPL Horizons, etc.)",
+    "matchedStatuses": ["failed"],
+    "traceRegex": ".*@pytest\\.mark\\.golden.*"
+  },
+  {
+    "name": "Assertion Failures",
+    "description": "Standard assertion failures in test logic",
+    "messageRegex": ".*AssertionError.*",
+    "matchedStatuses": ["failed"]
+  },
+  {
+    "name": "Value Errors",
+    "description": "Invalid input or parameter errors",
+    "messageRegex": ".*ValueError.*",
+    "matchedStatuses": ["failed"]
+  },
+  {
+    "name": "Infrastructure Issues",
+    "description": "Environment, connection, or system errors",
+    "messageRegex": ".*(ConnectionError|TimeoutError|OSError|IOError|FileNotFoundError).*",
+    "matchedStatuses": ["broken"]
+  },
+  {
+    "name": "Skipped Tests",
+    "description": "Tests skipped due to missing dependencies or conditions",
+    "matchedStatuses": ["skipped"]
+  },
+  {
+    "name": "Product Defects",
+    "description": "General test failures indicating bugs",
+    "matchedStatuses": ["failed"]
+  }
+]

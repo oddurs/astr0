@@ -48,6 +48,10 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Allure reports
+allure-results/
+allure-report/
+
 # Translations
 *.mo
 *.pot

@@ -45,6 +45,7 @@ dev = [
     "hypothesis>=6.0",
     "mypy>=1.0",
     "ruff>=0.1",
+    "allure-pytest>=2.13.0",
 ]
 
 [project.scripts]
@@ -62,7 +63,8 @@ packages = ["src/starward"]
 testpaths = ["tests"]
 # Default: clean output without coverage spam
 # Use -v for verbose, --cov for coverage
-addopts = "-q --tb=short"
+# Allure results generated automatically; use --clean-alluredir to reset
+addopts = "-q --tb=short --alluredir=allure-results"
 pythonpath = ["src"]
 # Test collection display
 console_output_style = "progress"
