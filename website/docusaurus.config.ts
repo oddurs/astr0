@@ -198,6 +198,12 @@ const config: Config = {
           label: 'Documentation',
         },
         {
+          type: 'docSidebar',
+          sidebarId: 'development',
+          position: 'left',
+          label: 'Development',
+        },
+        {
           to: '/blog',
           label: 'Blog',
           position: 'left',
@@ -227,10 +233,17 @@ const config: Config = {
           ],
         },
         {
+          title: 'Development',
+          items: [
+            { label: 'Contributing', to: '/docs/development/contributing' },
+            { label: 'Testing', to: '/docs/development/testing' },
+            { label: 'Cheatsheet', to: '/docs/development/cheatsheet' },
+          ],
+        },
+        {
           title: 'Community',
           items: [
             { label: 'GitHub Issues', href: 'https://github.com/oddurs/starward/issues' },
-            { label: 'Contributing', href: 'https://github.com/oddurs/starward/blob/master/CONTRIBUTING.md' },
           ],
         },
         {

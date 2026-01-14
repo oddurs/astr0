@@ -57,6 +57,15 @@ const sidebars: SidebarsConfig = {
       ],
     },
   ],
+  development: [
+    'development/overview',
+    'development/testing',
+    'development/contributing',
+    'development/dependencies',
+    'development/cheatsheet',
+    'development/maintainers',
+    'development/license',
+  ],
 };
 
 export default sidebars;
