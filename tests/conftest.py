@@ -25,9 +25,19 @@ Architecture:
 from __future__ import annotations
 
 import pytest
-import math
+import platform
+import shutil
+from pathlib import Path
 from datetime import datetime, timezone
 from typing import Callable, Any
+
+# Allure import (optional - graceful degradation if not installed)
+try:
+    import allure
+    from allure_commons.types import Severity
+    ALLURE_AVAILABLE = True
+except ImportError:
+    ALLURE_AVAILABLE = False
 
 
 # =============================================================================
@@ -94,25 +104,116 @@ def pytest_configure(config):
 
 
 # =============================================================================
+# Allure Report Integration
+# =============================================================================
+
+def pytest_collection_modifyitems(items):
+    """Auto-apply Allure metadata based on test location and markers."""
+    if not ALLURE_AVAILABLE:
+        return
+
+    for item in items:
+        fspath = str(item.fspath)
+
+        # Epic from test directory
+        if "/core/" in fspath:
+            item.add_marker(allure.epic("Core Library"))
+        elif "/cli/" in fspath:
+            item.add_marker(allure.epic("CLI Commands"))
+        elif "/integration/" in fspath:
+            item.add_marker(allure.epic("Integration"))
+        elif "/output/" in fspath:
+            item.add_marker(allure.epic("Output Formatting"))
+        else:
+            item.add_marker(allure.epic("Other"))
+
+        # Feature from module name (test_angles.py -> "Angles")
+        module_name = item.module.__name__.split(".")[-1]
+        feature_name = module_name.replace("test_", "").replace("_", " ").title()
+        item.add_marker(allure.feature(feature_name))
+
+        # Story from test class name if present
+        if item.cls:
+            story_name = item.cls.__name__.replace("Test", "").replace("_", " ")
+            item.add_marker(allure.story(story_name))
+
+        # Map existing pytest markers to Allure severity
+        if item.get_closest_marker("golden"):
+            item.add_marker(allure.severity(Severity.CRITICAL))
+        elif item.get_closest_marker("edge"):
+            item.add_marker(allure.severity(Severity.NORMAL))
+        elif item.get_closest_marker("roundtrip"):
+            item.add_marker(allure.severity(Severity.NORMAL))
+        elif item.get_closest_marker("slow"):
+            item.add_marker(allure.severity(Severity.MINOR))
+        elif item.get_closest_marker("verbose"):
+            item.add_marker(allure.severity(Severity.TRIVIAL))
+
+
+def pytest_sessionfinish(session, exitstatus):
+    """Generate Allure environment and categories files after test run."""
+    if not ALLURE_AVAILABLE:
+        return
+
+    allure_dir = Path("allure-results")
+    if not allure_dir.exists():
+        return
+
+    # Generate environment.properties
+    try:
+        import starward
+        starward_version = starward.__version__
+    except Exception:
+        starward_version = "unknown"
+
+    env_content = f"""Python.Version={platform.python_version()}
+Platform={platform.system()} {platform.release()}
+Starward.Version={starward_version}
+Pytest.Version={pytest.__version__}
+"""
+    (allure_dir / "environment.properties").write_text(env_content)
+
+    # Copy categories.json if it exists
+    categories_src = Path(__file__).parent / "allure" / "categories.json"
+    if categories_src.exists():
+        shutil.copy(categories_src, allure_dir / "categories.json")
+
+
+# =============================================================================
+# Allure Fixture Decorator Helper
+# =============================================================================
+
+def allure_title(title: str):
+    """Apply allure.title decorator if allure is available, otherwise no-op."""
+    if ALLURE_AVAILABLE:
+        return allure.title(title)
+    return lambda f: f
+
+
+# =============================================================================
 # Tolerance Fixtures
 # =============================================================================
 
 @pytest.fixture
+@allure_title("Angle Tolerance (0.1 arcsec)")
 def angle_tolerance():
     """Tolerance for angle comparisons (arcseconds)."""
     return 0.1  # 0.1 arcsecond
 
 @pytest.fixture
+@allure_title("Time Tolerance (1.0 sec)")
 def time_tolerance():
     """Tolerance for time comparisons (seconds)."""
     return 1.0  # 1 second
 
 @pytest.fixture
+@allure_title("Position Tolerance (0.01 deg)")
 def position_tolerance():
     """Tolerance for position comparisons (degrees)."""
     return 0.01  # ~36 arcseconds
 
 @pytest.fixture
+@allure_title("Distance Tolerance (0.1%)")
 def distance_tolerance():
     """Tolerance for distance comparisons (relative)."""
     return 0.001  # 0.1%
@@ -192,12 +293,14 @@ def messier_objects():
 # =============================================================================
 
 @pytest.fixture
+@allure_title("J2000.0 Epoch")
 def j2000_epoch():
     """J2000.0 epoch."""
     from starward.core.time import JulianDate
     return JulianDate(2451545.0)
 
 @pytest.fixture
+@allure_title("Historical Reference Dates")
 def known_dates():
     """Well-known dates for testing."""
     from starward.core.time import JulianDate
@@ -215,6 +318,7 @@ def known_dates():
 # =============================================================================
 
 @pytest.fixture
+@allure_title("Greenwich Observatory")
 def greenwich():
     """Royal Observatory Greenwich."""
     from starward.core.observer import Observer
@@ -227,6 +331,7 @@ def greenwich():
     )
 
 @pytest.fixture
+@allure_title("Mauna Kea Observatory")
 def mauna_kea():
     """Mauna Kea Observatory, Hawaii."""
     from starward.core.observer import Observer
@@ -239,6 +344,7 @@ def mauna_kea():
     )
 
 @pytest.fixture
+@allure_title("Paranal Observatory")
 def paranal():
     """ESO Paranal Observatory, Chile."""
     from starward.core.observer import Observer
@@ -251,6 +357,7 @@ def paranal():
     )
 
 @pytest.fixture
+@allure_title("North Pole Observer")
 def north_pole():
     """North Pole observer."""
     from starward.core.observer import Observer
@@ -262,6 +369,7 @@ def north_pole():
     )
 
 @pytest.fixture
+@allure_title("Equator Observer")
 def equator():
     """Observer on the equator."""
     from starward.core.observer import Observer
